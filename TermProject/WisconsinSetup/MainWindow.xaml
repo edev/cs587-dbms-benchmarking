@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WisconsinSetup"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="Wisconsin Benchmark Setup" Height="450" Width="800" MinWidth="600">
+        Title="Wisconsin Benchmark Setup" Height="600" Width="800" MinHeight="450" MinWidth="600">
     <Window.Resources>
         <GridLength x:Key="GlInnerMargin">4</GridLength>
         <GridLength x:Key="StandardHeight">28</GridLength>
@@ -14,8 +14,11 @@
         <Thickness x:Key="TInnerMargin">0,0,4,0</Thickness>
         <local:Multipliers x:Key="Multipliers"></local:Multipliers>
     </Window.Resources>
-    <StackPanel Orientation="Vertical">
-        <GroupBox Header="Connection" VerticalAlignment="Top" Grid.Row="0" Margin="{StaticResource TInnerMargin}">
+    <DockPanel VerticalAlignment="Stretch">
+        <GroupBox Header="Connection" 
+                  DockPanel.Dock="Top"
+                  VerticalAlignment="Top" 
+                  Margin="{StaticResource TInnerMargin}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
@@ -35,10 +38,10 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox VerticalAlignment="Top" Grid.Row="2">
-            <GroupBox.Header>
-                <Label>Table Setup</Label>
-            </GroupBox.Header>
+        <GroupBox Header="Table Setup" 
+                  DockPanel.Dock="Top" 
+                  VerticalAlignment="Top" 
+                  Margin="{StaticResource TInnerMargin}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
@@ -176,5 +179,11 @@
                 </Button>
             </Grid>
         </GroupBox>
-    </StackPanel>
+
+        <GroupBox Header="Log" 
+                  DockPanel.Dock="Top" 
+                  VerticalAlignment="Stretch">
+            <TextBox Name="TbLog" IsReadOnly="True" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto" />
+        </GroupBox>
+    </DockPanel>
 </Window>

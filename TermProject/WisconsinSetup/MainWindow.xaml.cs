@@ -39,7 +39,8 @@ namespace WisconsinSetup
                 return;
             }
 
-            Console.WriteLine(message);
+            TbLog.AppendText(message + "\n");
+            TbLog.ScrollToEnd();
         }
 
         /* This function contains the exact instructions for making a given table,
@@ -47,8 +48,25 @@ namespace WisconsinSetup
          */
         private void _makeTable(string tableName)
         {
-            _logLine(_tableManager?.DropTableIfExists(tableName));
-            _logLine(_tableManager?.CreateTable(tableName));
+            if (_tableManager == null)
+            {
+                _logLine("Table manager is not ready.");
+                return;
+            }
+            _logLine($"Make table: {tableName}");
+            _logLine(_tableManager.DropTableIfExists(tableName));
+            _logLine(_tableManager.CreateTable(tableName));
+        }
+
+        private void _dropTable(string tableName)
+        {
+            if (_tableManager == null)
+            {
+                _logLine("Table manager is not ready.");
+                return;
+            }
+            _logLine($"Drop table: {tableName}");
+            _logLine(_tableManager.DropTableIfExists(tableName));
         }
 
         private void BtnConnect_OnClick(object sender, RoutedEventArgs e)
@@ -58,6 +76,7 @@ namespace WisconsinSetup
                 _tableManager = null;
                 if (Connection.State == ConnectionState.Open)
                 {
+                    _logLine("Closing connection.");
                     Connection.Close();
                 }
 
@@ -66,16 +85,21 @@ namespace WisconsinSetup
                 Connection.ConnectionString = TbConnectionString.Text;
                 Connection.Open();
                 _tableManager = new TableManager(Connection);
+                _logLine("Connection open.");
             }
             catch (Exception exc)
             {
-                Console.WriteLine(exc);
+                _logLine(exc.Message);
             }
             LblConnectionStatus.Content = Connection.State;
         }
 
         private void BtnDisconnect_OnClick(object sender, RoutedEventArgs e)
         {
+            if (Connection.State == ConnectionState.Open)
+            {
+                _logLine("Closing connection.");
+            }
             Connection.Close();
             LblConnectionStatus.Content = Connection.State;
             _tableManager = null;
@@ -102,27 +126,27 @@ namespace WisconsinSetup
             _makeTable(TbTableName2.Text);
             _makeTable(TbTableName3.Text);
         }
-
+         
         private void BtnDropTable1_OnClick(object sender, RoutedEventArgs e)
         {
-            _logLine(_tableManager?.DropTableIfExists(TbTableName1.Text));
+            _dropTable(TbTableName1.Text);
         }
 
         private void BtnDropTable2_OnClick(object sender, RoutedEventArgs e)
         {
-            _logLine(_tableManager?.DropTableIfExists(TbTableName2.Text));
+            _dropTable(TbTableName2.Text);
         }
 
         private void BtnDropTable3_OnClick(object sender, RoutedEventArgs e)
         {
-            _logLine(_tableManager?.DropTableIfExists(TbTableName3.Text));
+            _dropTable(TbTableName3.Text);
         }
 
         private void BtnDropAll_OnClick(object sender, RoutedEventArgs e)
         {
-            _logLine(_tableManager?.DropTableIfExists(TbTableName1.Text));
-            _logLine(_tableManager?.DropTableIfExists(TbTableName2.Text));
-            _logLine(_tableManager?.DropTableIfExists(TbTableName3.Text));
+            _dropTable(TbTableName1.Text);
+            _dropTable(TbTableName2.Text);
+            _dropTable(TbTableName3.Text);
         }
     }
 }

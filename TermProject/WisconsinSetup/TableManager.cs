@@ -36,6 +36,8 @@ namespace WisconsinSetup
             DROP TABLE IF EXISTS {0};
         ";
 
+        private const string LogIndent = "    ";
+
         private readonly SQC.SqlConnection _connection;
 
         public TableManager(SQC.SqlConnection connection)
@@ -47,35 +49,35 @@ namespace WisconsinSetup
         {
             var query = String.Format(CreateTableSql, tableName);
             var cmd = new SQC.SqlCommand(query, _connection);
-            return _cmdToString(cmd);
+            return _cmdToString("CREATE TABLE", cmd);
         }
 
         public string DropTableIfExists(string tableName)
         {
             var query = String.Format(DropTableSql, tableName);
             var cmd = new SQC.SqlCommand(query, _connection);
-            return _cmdToString(cmd);
+            return _cmdToString("DROP TABLE IF EXISTS", cmd);
         }
 
-        private string _cmdToString(SQC.SqlCommand command)
+        private string _cmdToString(string commandDescription, SQC.SqlCommand command)
         {
             try
             {
                 int rowsAffected = command.ExecuteNonQuery();
-                return $"{rowsAffected} rows affected.";
+                return $"{LogIndent}{commandDescription}: {rowsAffected} rows affected.";
             }
             catch (SQC.SqlException sqe)
             {
                 var errorString = new StringBuilder();
                 foreach (SQC.SqlError ex in sqe.Errors)
                 {
-                    errorString.AppendLine(ex.Message);
+                    errorString.AppendLine($"{LogIndent}{LogIndent}{ex.Message}");
                 }
-                return errorString.ToString();
+                return $"{LogIndent}{commandDescription}:\n{errorString.ToString()}";
             }
             catch (Exception e)
             {
-                return e.Message;
+                return $"{LogIndent}{commandDescription}: {e.Message}";
             }
         }
     }
