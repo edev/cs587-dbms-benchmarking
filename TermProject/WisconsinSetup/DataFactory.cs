@@ -120,7 +120,7 @@ namespace WisconsinSetup
         {
             char[] tmp = new char[7];
             char[] result = new char[7];
-            long i, j, remainder;
+            long i, remainder;
 
             /* Set the result string to 'AAAAAA' initially. */
             for (i = 0; i < 7; i++)
