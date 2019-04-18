@@ -10,14 +10,16 @@ namespace WisconsinSetup
     {
         static void Main(string[] args)
         {
-            convertRange(DataFactory.OrderedConvert, 0, 32);
+            // convertRange(Relation.OrderedConvert, 0, 32);
 
-            long start = 0;
-            long end = 47995000;
-            //testRange(DataFactory.KavinConvert, start, end);
-            //testRange(DataFactory.Convert, start, end);
-            // testRange(DataFactory.PaperConvert, start, end, true);
-            // testRange(DataFactory.OrderedConvert, start, end); // Good! No duplicates found.
+            // long start = 0;
+            // long end = 47995000;
+            //testRange(Relation.KavinConvert, start, end);
+            //testRange(Relation.Convert, start, end);
+            // testRange(Relation.PaperConvert, start, end, true);
+            // testRange(Relation.OrderedConvert, start, end); // Good! No duplicates found.
+
+            Relation.ShowUnique1Range(64);
 
             Console.ReadLine();
         }
