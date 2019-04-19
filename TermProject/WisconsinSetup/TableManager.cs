@@ -79,6 +79,7 @@ namespace WisconsinSetup
             var path = Path.GetFullPath(filename);
             var query = String.Format(BulkInsertSql, tableName, path);
             var cmd = new SQC.SqlCommand(query, _connection);
+            cmd.CommandTimeout = 600; // Arbitrarily specify 10-minute timeout.
             return _cmdToString("BULK INSERT", cmd);
         }
 

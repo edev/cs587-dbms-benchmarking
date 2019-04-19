@@ -95,6 +95,7 @@ namespace WisconsinSetup
 
         private void BtnCreateTable1_OnClick(object sender, RoutedEventArgs e)
         {
+
             tryMakeTable(TbTableName1.Text, TbRows1.Text, _viewModel.Multiplier1.ToInt64());
         }
 
@@ -112,7 +113,7 @@ namespace WisconsinSetup
         {
             tryMakeTable(TbTableName1.Text, TbRows1.Text, _viewModel.Multiplier1.ToInt64());
             tryMakeTable(TbTableName2.Text, TbRows2.Text, _viewModel.Multiplier2.ToInt64());
-            tryMakeTable(TbTableName2.Text, TbRows3.Text, _viewModel.Multiplier3.ToInt64());
+            tryMakeTable(TbTableName3.Text, TbRows3.Text, _viewModel.Multiplier3.ToInt64());
         }
          
         // ========
