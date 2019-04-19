@@ -41,10 +41,28 @@ namespace WisconsinSetup
         // Beware: these are UTF-16!
         public readonly string stringu1, stringu2, string4;
 
-        public string InsertString =>
-            $"({unique1}, {unique2}, {two}, {four}, {ten}, {twenty}, {onePercent}, " +
-            $"{tenPercent}, {twentyPercent}, {fiftyPercent}, {unique3}, {evenOnePercent}, " +
-            $"{oddOnePercent}, '{stringu1}', '{stringu2}', '{string4}')";
+        public string InsertString => "(" + CsvString + ")";
+
+        public string CsvString =>
+                String.Join(",", new string[]
+                {
+                    unique1.ToString(),
+                    unique2.ToString(),
+                    two.ToString(),
+                    four.ToString(),
+                    ten.ToString(),
+                    twenty.ToString(),
+                    onePercent.ToString(),
+                    tenPercent.ToString(),
+                    twentyPercent.ToString(),
+                    fiftyPercent.ToString(),
+                    unique3.ToString(),
+                    evenOnePercent.ToString(),
+                    oddOnePercent.ToString(),
+                    stringu1,
+                    stringu2,
+                    string4
+                });
 
         public Record(long unique1, long unique2)
         {

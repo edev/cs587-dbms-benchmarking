@@ -2,39 +2,59 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.TextFormatting;
+using EnsureThat;
 
 namespace WisconsinSetup
 {
     public class Relation : IEnumerable
     {
-        private readonly long _numberOfRecords;
+        public readonly long NumberOfRecords;
+        public readonly string TableName;
 
         /* Creates an iterable factory that returns exactly the number
            of records specified. */
-        public Relation(long numberOfRecords)
+        public Relation(string tableName, long numberOfRecords)
         {
-            _numberOfRecords = numberOfRecords;
+            Ensure.That(tableName).IsNotNullOrWhiteSpace();
+
+            TableName = tableName;
+            NumberOfRecords = numberOfRecords;
         }
 
         public static void ShowRecords(long numberOfRecords)
         {
-            foreach (Record r in new Relation(numberOfRecords))
+            foreach (Record r in new Relation("test", numberOfRecords))
             {
-                Console.WriteLine(r.InsertString);
+                Console.WriteLine(r.CsvString);
             }
         }
 
+        public void WriteCsv()
+        {
+            string filename = TableName + ".csv";
+            using (StreamWriter sw = File.CreateText(filename))
+            {
+                // Though the CLR uses UTF-16, CreateText opens a UTF-8 stream.
+
+                foreach (Record record in this)
+                {
+                    // Write each record to the file on its own line.
+                    sw.WriteLine(record.CsvString);
+                }
+            }
+        }
 
         /* For IEnumerable. */
         public IEnumerator GetEnumerator()
         {
-            return new RelationEnum(_numberOfRecords);
+            return new RelationEnum(NumberOfRecords);
         }
 
         /* IEnumerator child-class required by IEnumerable. */

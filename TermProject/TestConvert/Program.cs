@@ -19,7 +19,9 @@ namespace WisconsinSetup
             // testRange(Relation.PaperConvert, start, end, true);
             // testRange(Relation.ConvertLongToString, start, end); // Good! No duplicates found.
 
-            Relation.ShowRecords(64);
+            // Relation.ShowRecords(64);
+
+            new Relation("TestTable32", 32).WriteCsv();
 
             Console.ReadLine();
         }
