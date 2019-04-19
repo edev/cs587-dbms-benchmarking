@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Diagnostics;
 using System.Collections.Generic;
 using SQC = System.Data.SqlClient;
 using System.Linq;
@@ -23,51 +24,82 @@ namespace WisconsinSetup
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly MainWindowViewModel _viewModel;
+
         private SQC.SqlConnection Connection { get; set; } = new SQC.SqlConnection();
 
         private TableManager _tableManager = null;
         
+        private Multipliers MultiplierCollection = new Multipliers();
+
         public MainWindow()
         {
             InitializeComponent();
+            _viewModel = new MainWindowViewModel();
+            DataContext = _viewModel;
+            TbLog.TextChanged += LogTextChanged;
         }
 
-        private void _logLine(string message)
+        /* Scroll to the end of the log any time it changes. This event is fired when
+         * the associated binding changes.
+         */
+        public void LogTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (message == null)
-            {
-                return;
-            }
-
-            TbLog.AppendText(message + "\n");
             TbLog.ScrollToEnd();
         }
 
         /* This function contains the exact instructions for making a given table,
          * expressed in terms of TableManager methods.
+         TODO Make this async, or run in a background task, or whatever. Don't lock up the UI thread.
          */
-        private void _makeTable(string tableName)
+        private void _makeTable(string tableName, long tableSize)
         {
+            StringBuilder resultString = new StringBuilder();
             if (_tableManager == null)
             {
-                _logLine("Table manager is not ready.");
+                _viewModel.LogEntry("Table manager is not ready.");
                 return;
             }
-            _logLine($"Make table: {tableName}");
-            _logLine(_tableManager.DropTableIfExists(tableName));
-            _logLine(_tableManager.CreateTable(tableName));
+
+            var watch = new Stopwatch();
+            watch.Start();
+            resultString.AppendLine($"Make table: {tableName}");
+            resultString.AppendLine(_tableManager.DropTableIfExists(tableName));
+            resultString.AppendLine(_tableManager.CreateTable(tableName));
+            var relation = new Relation(tableName, tableSize);
+            resultString.AppendLine($"Write CSV");
+            relation.WriteCsv();
+            // resultString.AppendLine(_tableManager.InsertRows(relation));
+            resultString.AppendLine(_tableManager.BulkInsert(tableName, relation.CsvFilename));
+
+            resultString.AppendLine("Done.");
+            watch.Stop();
+            // Copied from official example: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.stopwatch?redirectedfrom=MSDN&view=netframework-4.8
+            // Get the elapsed time as a TimeSpan value.
+            TimeSpan ts = watch.Elapsed;
+
+            // Format and display the TimeSpan value.
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+            resultString.AppendLine($"Elapsed time: {elapsedTime}");
+            _viewModel.LogEntry(resultString.ToString());
         }
 
         private void _dropTable(string tableName)
         {
             if (_tableManager == null)
             {
-                _logLine("Table manager is not ready.");
+                _viewModel.LogEntry("Table manager is not ready.");
                 return;
             }
-            _logLine($"Drop table: {tableName}");
-            _logLine(_tableManager.DropTableIfExists(tableName));
+            _viewModel.LogEntry($"Drop table: {tableName}");
+            _viewModel.LogEntry(_tableManager.DropTableIfExists(tableName));
         }
+
+        private long Table1Size => Convert.ToInt64(TbRows1.Text) * (Multipliers.Mappings[(string)CbMultiplier1.SelectedValue]);
+        private long Table2Size => Convert.ToInt64(TbRows3.Text) * (Multipliers.Mappings[(string)CbMultiplier2.SelectedValue]);
+        private long Table3Size => Convert.ToInt64(TbRows3.Text) * (Multipliers.Mappings[(string)CbMultiplier3.SelectedValue]);
 
         private void BtnConnect_OnClick(object sender, RoutedEventArgs e)
         {
@@ -76,7 +108,7 @@ namespace WisconsinSetup
                 _tableManager = null;
                 if (Connection.State == ConnectionState.Open)
                 {
-                    _logLine("Closing connection.");
+                    _viewModel.LogEntry("Closing connection.");
                     Connection.Close();
                 }
 
@@ -85,11 +117,11 @@ namespace WisconsinSetup
                 Connection.ConnectionString = TbConnectionString.Text;
                 Connection.Open();
                 _tableManager = new TableManager(Connection);
-                _logLine("Connection open.");
+                _viewModel.LogEntry("Connection open.");
             }
             catch (Exception exc)
             {
-                _logLine(exc.Message);
+                _viewModel.LogEntry(exc.Message);
             }
             LblConnectionStatus.Content = Connection.State;
         }
@@ -98,7 +130,7 @@ namespace WisconsinSetup
         {
             if (Connection.State == ConnectionState.Open)
             {
-                _logLine("Closing connection.");
+                _viewModel.LogEntry("Closing connection.");
             }
             Connection.Close();
             LblConnectionStatus.Content = Connection.State;
@@ -107,24 +139,52 @@ namespace WisconsinSetup
 
         private void BtnCreateTable1_OnClick(object sender, RoutedEventArgs e)
         {
-            _makeTable(TbTableName1.Text);
+            try
+            {
+                _makeTable(TbTableName1.Text, Table1Size);
+            }
+            catch (System.FormatException)
+            {
+                _viewModel.LogEntry("# of rows must be a positive integer.");
+            }
         }
 
         private void BtnCreateTable2_OnClick(object sender, RoutedEventArgs e)
         {
-            _makeTable(TbTableName2.Text);
+            try
+            {
+                _makeTable(TbTableName2.Text, Table2Size);
+            }
+            catch (System.FormatException)
+            {
+                _viewModel.LogEntry("# of rows must be a positive integer.");
+            }
         }
 
         private void BtnCreateTable3_OnClick(object sender, RoutedEventArgs e)
         {
-            _makeTable(TbTableName3.Text);
+            try
+            {
+                _makeTable(TbTableName3.Text, Table3Size);
+            }
+            catch (System.FormatException)
+            {
+                _viewModel.LogEntry("# of rows must be a positive integer.");
+            }
         }
 
         private void BtnCreateAll_OnClick(object sender, RoutedEventArgs e)
         {
-            _makeTable(TbTableName1.Text);
-            _makeTable(TbTableName2.Text);
-            _makeTable(TbTableName3.Text);
+            try
+            {
+                _makeTable(TbTableName1.Text, Table1Size);
+                _makeTable(TbTableName2.Text, Table2Size);
+                _makeTable(TbTableName3.Text, Table3Size);
+            }
+            catch (System.FormatException)
+            {
+                _viewModel.LogEntry("# of rows must be a positive integer.");
+            }
         }
          
         private void BtnDropTable1_OnClick(object sender, RoutedEventArgs e)

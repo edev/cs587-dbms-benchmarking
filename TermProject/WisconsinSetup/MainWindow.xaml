@@ -183,7 +183,11 @@
         <GroupBox Header="Log" 
                   DockPanel.Dock="Top" 
                   VerticalAlignment="Stretch">
-            <TextBox Name="TbLog" IsReadOnly="True" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto" />
+            <TextBox Name="TbLog" 
+                     IsReadOnly="True" 
+                     VerticalAlignment="Stretch" 
+                     VerticalScrollBarVisibility="Auto" 
+                     Text="{Binding Path=Log, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
         </GroupBox>
     </DockPanel>
 </Window>

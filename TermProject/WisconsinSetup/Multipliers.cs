@@ -9,8 +9,8 @@ namespace WisconsinSetup
 {
     class Multipliers : ObservableCollection<String>
     {
-        public System.Collections.Generic.Dictionary<string, long> Mappings { get; } = new Dictionary<string, long>();
-        public Multipliers()
+        public static System.Collections.Generic.Dictionary<string, long> Mappings { get; } = new Dictionary<string, long>();
+        static Multipliers()
         {
             // Create the default mappings.
             _add("1x", 1);
@@ -18,10 +18,17 @@ namespace WisconsinSetup
             _add("Million", 1000000);
         }
 
-        private void _add(string key, long val)
+        public Multipliers()
+        {
+            foreach (string key in Mappings.Keys)
+            {
+                Add(key);
+            }
+        }
+
+        private static void _add(string key, long val)
         {
             Mappings.Add(key, val);
-            Add(key);
         }
     }
 }

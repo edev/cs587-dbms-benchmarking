@@ -17,6 +17,7 @@ namespace WisconsinSetup
     {
         public readonly long NumberOfRecords;
         public readonly string TableName;
+        public string CsvFilename => TableName + ".csv";
 
         /* Creates an iterable factory that returns exactly the number
            of records specified. */
@@ -38,7 +39,7 @@ namespace WisconsinSetup
 
         public void WriteCsv()
         {
-            string filename = TableName + ".csv";
+            string filename = CsvFilename;
             using (StreamWriter sw = File.CreateText(filename))
             {
                 // Though the CLR uses UTF-16, CreateText opens a UTF-8 stream.
