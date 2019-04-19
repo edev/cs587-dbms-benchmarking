@@ -25,6 +25,7 @@ namespace WisconsinSetup
             Multiplier1 = Multipliers[0];
             Multiplier2 = Multipliers[0];
             Multiplier3 = Multipliers[0];
+            ConnectionString = "Data Source=DYLAN-6CORE;Initial Catalog=wiscbench;Integrated Security=true;";
         }
 
         // ========
@@ -41,7 +42,7 @@ namespace WisconsinSetup
         {
             if (propertyName != null)
             {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
             Console.WriteLine($"{propertyName} changed.");
         }
@@ -146,14 +147,16 @@ namespace WisconsinSetup
         // SECTION: Table Sizes
         // ========
 
-        
+        // TODO See whether to use a converter and validation rule here. Seems like a lot of work and isn't very well explained on docs.microsoft.com.
+        // For now, we do NOT bind these, because it saves quite a bit of work to simply attempt to convert them on-demand in the MainWindow code-behind.
+        // It's not ideal, but it's a lot less work, and it's plenty good for this project.
 
         // ========
         // SECTION: Table Size Multipliers
         // ========
 
         // Our collection of multipliers, which populates the selectable list in the UI.
-        public ObservableCollection<Multiplier> Multipliers = new ObservableCollection<Multiplier>
+        public ObservableCollection<Multiplier> Multipliers { get; } = new ObservableCollection<Multiplier>
         {
             new Multiplier("1x", 1),
             new Multiplier("Thousand", 1000),
@@ -219,7 +222,7 @@ namespace WisconsinSetup
 
         /* This function contains the exact instructions for making a given table,
          * expressed in terms of TableManager methods.
-         TODO Make this async, or run in a background task, or whatever. Don't lock up the UI thread.
+         TODO Make this async, or run in a background task, or whatever. Don't lock up the UI thread or we'll crash/pause to debug!
          */
         public void MakeTable(string tableName, long tableSize)
         {

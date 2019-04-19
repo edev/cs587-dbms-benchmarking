@@ -24,7 +24,7 @@ namespace WisconsinSetup
 
         public override string ToString() => _label;
 
-        public long ToInt64(IFormatProvider provider) => _value;
+        public long ToInt64(IFormatProvider provider = null) => _value;
 
         // ========
         // SECTION: Invalid casts
@@ -32,7 +32,7 @@ namespace WisconsinSetup
 
         public TypeCode GetTypeCode()
         {
-            throw new NotImplementedException();
+            return TypeCode.Object;
         }
 
         public bool ToBoolean(IFormatProvider provider)

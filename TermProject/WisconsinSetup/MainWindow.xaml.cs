@@ -26,8 +26,6 @@ namespace WisconsinSetup
     {
         private readonly MainWindowViewModel _viewModel;
 
-        private Multipliers MultiplierCollection = new Multipliers();
-
         public MainWindow()
         {
             InitializeComponent();
@@ -44,11 +42,9 @@ namespace WisconsinSetup
             TbLog.ScrollToEnd();
         }
 
-        private long Table1Size => Convert.ToInt64(TbRows1.Text) * (Multipliers.Mappings[(string)CbMultiplier1.SelectedValue]);
-        private long Table2Size => Convert.ToInt64(TbRows3.Text) * (Multipliers.Mappings[(string)CbMultiplier2.SelectedValue]);
-        private long Table3Size => Convert.ToInt64(TbRows3.Text) * (Multipliers.Mappings[(string)CbMultiplier3.SelectedValue]);
-
-        /* Ask the ViewModel to connect using the user's connection string. */
+        // ========
+        // SECTION: Connect/disconnect
+        // ========
         private void BtnConnect_OnClick(object sender, RoutedEventArgs e)
         {
             _viewModel.Connect();
@@ -59,56 +55,70 @@ namespace WisconsinSetup
             _viewModel.Disconnect();
         }
 
-        private void BtnCreateTable1_OnClick(object sender, RoutedEventArgs e)
+        // ========
+        // SECTION: Create table(s)
+        // ========
+
+        private long? _tryConvertToLong(string value)
         {
             try
             {
-                _viewModel.MakeTable(TbTableName1.Text, Table1Size);
+                long v = Convert.ToInt64(value);
+                if (v < 0)
+                {
+                    // Conversion succeeded, but the number is negative and thus invalid.
+                    return null;
+                }
+
+                // Valid conversion!
+                return v;
             }
-            catch (System.FormatException)
+            catch
             {
-                _viewModel.LogEntry("# of rows must be a positive integer.");
+                // Conversion from string to long failed.
+                return null;
             }
+        }
+
+        private void tryMakeTable(string tableName, string numRowsString, long multiplier)
+        {
+            long? numRows = _tryConvertToLong(numRowsString);
+            if (!numRows.HasValue)
+            {
+                // Conversion failed.
+                _viewModel.LogEntry($"{numRowsString} is not a valid number of rows.");
+                return;
+            }
+
+            _viewModel.MakeTable(tableName, numRows.Value * multiplier);
+        }
+
+        private void BtnCreateTable1_OnClick(object sender, RoutedEventArgs e)
+        {
+            tryMakeTable(TbTableName1.Text, TbRows1.Text, _viewModel.Multiplier1.ToInt64());
         }
 
         private void BtnCreateTable2_OnClick(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                _viewModel.MakeTable(TbTableName2.Text, Table2Size);
-            }
-            catch (System.FormatException)
-            {
-                _viewModel.LogEntry("# of rows must be a positive integer.");
-            }
+            tryMakeTable(TbTableName2.Text, TbRows2.Text, _viewModel.Multiplier2.ToInt64());
         }
 
         private void BtnCreateTable3_OnClick(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                _viewModel.MakeTable(TbTableName3.Text, Table3Size);
-            }
-            catch (System.FormatException)
-            {
-                _viewModel.LogEntry("# of rows must be a positive integer.");
-            }
+            tryMakeTable(TbTableName3.Text, TbRows3.Text, _viewModel.Multiplier3.ToInt64());
         }
 
         private void BtnCreateAll_OnClick(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                _viewModel.MakeTable(TbTableName1.Text, Table1Size);
-                _viewModel.MakeTable(TbTableName2.Text, Table2Size);
-                _viewModel.MakeTable(TbTableName3.Text, Table3Size);
-            }
-            catch (System.FormatException)
-            {
-                _viewModel.LogEntry("# of rows must be a positive integer.");
-            }
+            tryMakeTable(TbTableName1.Text, TbRows1.Text, _viewModel.Multiplier1.ToInt64());
+            tryMakeTable(TbTableName2.Text, TbRows2.Text, _viewModel.Multiplier2.ToInt64());
+            tryMakeTable(TbTableName2.Text, TbRows3.Text, _viewModel.Multiplier3.ToInt64());
         }
          
+        // ========
+        // SECTION: Drop table(s)
+        // ========
+
         private void BtnDropTable1_OnClick(object sender, RoutedEventArgs e)
         {
             _viewModel.DropTable(TbTableName1.Text);
