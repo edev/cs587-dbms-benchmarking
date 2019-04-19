@@ -44,7 +44,6 @@ namespace WisconsinSetup
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
-            Console.WriteLine($"{propertyName} changed.");
         }
 
         // ========
@@ -66,10 +65,12 @@ namespace WisconsinSetup
          */
         public void LogEntry(string entry, int nestingLevel = 0)
         {
-            string indent = String.Concat(Enumerable.Repeat(LogIndent, nestingLevel));
-            _log.AppendLine($"{indent}{entry}");
-            Console.WriteLine($"Log:\n{Log}\n\n");
-            NotifyPropertyChanged("Log");
+            lock (_log)
+            {
+                string indent = String.Concat(Enumerable.Repeat(LogIndent, nestingLevel));
+                _log.AppendLine($"{indent}{entry}");
+                NotifyPropertyChanged("Log");
+            }
         }
 
         // ========
@@ -220,46 +221,59 @@ namespace WisconsinSetup
         // SECTION: Make Table
         // ========
 
+        // All MakeTable instances will lock around this object in order to serialize their access.
+        private object makeTableLock = new object();
+
         /* This function contains the exact instructions for making a given table,
          * expressed in terms of TableManager methods.
          TODO Make this async, or run in a background task, or whatever. Don't lock up the UI thread or we'll crash/pause to debug!
          */
         public void MakeTable(string tableName, long tableSize)
         {
-            if (_tableManager == null)
+            lock (makeTableLock)
             {
-                LogEntry("Table manager is not ready.");
-                return;
+                if (_tableManager == null)
+                {
+                    LogEntry("Table manager is not ready.");
+                    return;
+                }
+
+                // We'll time the whole operation so we can report elapsed time at the end.
+                var watch = new Stopwatch();
+                watch.Start();
+
+                // First, we'll drop and re-create the table.
+                LogEntry($"Make table: {tableName}");
+                LogEntry(_tableManager.DropTableIfExists(tableName), 1);
+                LogEntry(_tableManager.CreateTable(tableName), 1);
+
+                // Next, we'll generate our rows and write our CSV file.
+                var relation = new Relation(tableName, tableSize);
+                LogEntry($"Write CSV"); // TODO Save some time by incorporating a row count into CSV filename and reusing it if it exists!
+                try
+                {
+                    relation.WriteCsv();
+                }
+                catch (Exception exc)
+                {
+                    LogEntry(exc.Message);
+                }
+
+                // Finally, we'll issue a bulk load command to our DBMS.
+                LogEntry(_tableManager.BulkInsert(tableName, relation.CsvFilename));
+
+                // Done!
+                LogEntry("Done.");
+                watch.Stop();
+
+                // Copied from official Microsoft example:
+                // https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.stopwatch?redirectedfrom=MSDN&view=netframework-4.8
+                TimeSpan ts = watch.Elapsed; // Get the elapsed time as a TimeSpan value.
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                    ts.Hours, ts.Minutes, ts.Seconds,
+                    ts.Milliseconds / 10);
+                LogEntry($"Elapsed time: {elapsedTime}");
             }
-
-            // We'll time the whole operation so we can report elapsed time at the end.
-            var watch = new Stopwatch();
-            watch.Start();
-
-            // First, we'll drop and re-create the table.
-            LogEntry($"Make table: {tableName}");
-            LogEntry(_tableManager.DropTableIfExists(tableName), 1);
-            LogEntry(_tableManager.CreateTable(tableName), 1);
-
-            // Next, we'll generate our rows and write our CSV file.
-            var relation = new Relation(tableName, tableSize);
-            LogEntry($"Write CSV"); // TODO Save some time by incorporating a row count into CSV filename and reusing it if it exists!
-            relation.WriteCsv();
-
-            // Finally, we'll issue a bulk load command to our DBMS.
-            LogEntry(_tableManager.BulkInsert(tableName, relation.CsvFilename));
-
-            // Done!
-            LogEntry("Done.");
-            watch.Stop();
-
-            // Copied from official Microsoft example:
-            // https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.stopwatch?redirectedfrom=MSDN&view=netframework-4.8
-            TimeSpan ts = watch.Elapsed;  // Get the elapsed time as a TimeSpan value.
-            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                ts.Hours, ts.Minutes, ts.Seconds,
-                ts.Milliseconds / 10);
-            LogEntry($"Elapsed time: {elapsedTime}");
         }
 
         // ========

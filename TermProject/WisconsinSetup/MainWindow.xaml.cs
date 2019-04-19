@@ -90,7 +90,7 @@ namespace WisconsinSetup
                 return;
             }
 
-            _viewModel.MakeTable(tableName, numRows.Value * multiplier);
+            Task.Run(() => _viewModel.MakeTable(tableName, numRows.Value * multiplier));
         }
 
         private void BtnCreateTable1_OnClick(object sender, RoutedEventArgs e)
@@ -121,24 +121,30 @@ namespace WisconsinSetup
 
         private void BtnDropTable1_OnClick(object sender, RoutedEventArgs e)
         {
-            _viewModel.DropTable(TbTableName1.Text);
+            string tableName = TbTableName1.Text;
+            Task.Run(() => _viewModel.DropTable(tableName));
         }
 
         private void BtnDropTable2_OnClick(object sender, RoutedEventArgs e)
         {
-            _viewModel.DropTable(TbTableName2.Text);
+            string tableName = TbTableName2.Text;
+            Task.Run(() => _viewModel.DropTable(tableName));
         }
 
         private void BtnDropTable3_OnClick(object sender, RoutedEventArgs e)
         {
-            _viewModel.DropTable(TbTableName3.Text);
+            string tableName = TbTableName2.Text;
+            _viewModel.DropTable(tableName);
         }
 
         private void BtnDropAll_OnClick(object sender, RoutedEventArgs e)
         {
-            _viewModel.DropTable(TbTableName1.Text);
-            _viewModel.DropTable(TbTableName2.Text);
-            _viewModel.DropTable(TbTableName3.Text);
+            string tableName1 = TbTableName1.Text;
+            _viewModel.DropTable(tableName1);
+            string tableName2 = TbTableName2.Text;
+            _viewModel.DropTable(tableName2);
+            string tableName3 = TbTableName3.Text;
+            _viewModel.DropTable(tableName3);
         }
 
         private void BtnDeleteCsvs_OnClick(object sender, RoutedEventArgs e)
