@@ -140,5 +140,10 @@ namespace WisconsinSetup
             _viewModel.DropTable(TbTableName2.Text);
             _viewModel.DropTable(TbTableName3.Text);
         }
+
+        private void BtnDeleteCsvs_OnClick(object sender, RoutedEventArgs e)
+        {
+            _viewModel.DeleteAllCsvs();
+        }
     }
 }

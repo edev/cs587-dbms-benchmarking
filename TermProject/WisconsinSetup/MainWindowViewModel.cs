@@ -261,5 +261,20 @@ namespace WisconsinSetup
                 ts.Milliseconds / 10);
             LogEntry($"Elapsed time: {elapsedTime}");
         }
+
+        // ========
+        // SECTION: Delete all CSVs
+        // ========
+
+        public void DeleteAllCsvs()
+        {
+            // Adapted from solution 1 of:
+            // https://www.codeproject.com/questions/74057/how-to-delete-all-files-with-specific-extension
+            foreach (string filename in System.IO.Directory.GetFiles(".", "*.csv"))
+            {
+                LogEntry($"Deleting {filename}");
+                System.IO.File.Delete(filename);
+            }
+        }
     }
 }

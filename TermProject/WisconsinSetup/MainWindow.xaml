@@ -187,6 +187,13 @@
                         Click="BtnCreateAll_OnClick">
                     Make all
                 </Button>
+
+                <Button Name="BtnDeleteCsvs"
+                        Grid.Row="10"
+                        Grid.Column="4"
+                        Click="BtnDeleteCsvs_OnClick">
+                    Delete CSVs
+                </Button>
             </Grid>
         </GroupBox>
 
