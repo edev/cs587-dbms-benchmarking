@@ -8,11 +8,10 @@
         mc:Ignorable="d"
         Title="Wisconsin Benchmark Setup" Height="600" Width="800" MinHeight="450" MinWidth="600">
     <Window.Resources>
-        <GridLength x:Key="GlInnerMargin">4</GridLength>
+        <GridLength x:Key="GridInnerMargin">4</GridLength>
         <GridLength x:Key="StandardHeight">28</GridLength>
         <GridLength x:Key="StandardWidth">100</GridLength>
         <Thickness x:Key="TInnerMargin">0,0,4,0</Thickness>
-        <local:Multipliers x:Key="Multipliers"></local:Multipliers>
     </Window.Resources>
     <DockPanel VerticalAlignment="Stretch">
         <GroupBox Header="Connection" 
@@ -22,16 +21,22 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
-                    <ColumnDefinition Width="{StaticResource GlInnerMargin}" />
+                    <ColumnDefinition Width="{StaticResource GridInnerMargin}" />
                     <ColumnDefinition Width="{StaticResource StandardWidth}" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="{StaticResource StandardHeight}" />
-                    <RowDefinition Height="{StaticResource GlInnerMargin}" />
+                    <RowDefinition Height="{StaticResource GridInnerMargin}" />
                     <RowDefinition Height="{StaticResource StandardHeight}" />
                 </Grid.RowDefinitions>
+
                 <Label Content="Connection String:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Bottom" />
-                <Label Name="LblConnectionStatus" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Label>
+                <Label Name="LblConnectionStatus" 
+                       Grid.Column="0" 
+                       Grid.Row="0" 
+                       HorizontalAlignment="Right" 
+                       VerticalAlignment="Bottom"
+                       Content="{Binding ConnectionState}"></Label>
                 <TextBox Name="TbConnectionString" Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center">Data Source=DYLAN-6CORE;Initial Catalog=wiscbench;Integrated Security=true;</TextBox>
                 <Button Name="BtnConnect" Grid.Column="2" Grid.Row="0" FontWeight="Bold" Click="BtnConnect_OnClick">Connect</Button>
                 <Button Name="BtnDisconnect" Grid.Column="2" Grid.Row="2" Click="BtnDisconnect_OnClick">Disconnect</Button>
@@ -45,24 +50,24 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
-                    <ColumnDefinition Width="{StaticResource GlInnerMargin}" />
+                    <ColumnDefinition Width="{StaticResource GridInnerMargin}" />
                     <ColumnDefinition Width="{StaticResource StandardWidth}" />
-                    <ColumnDefinition Width="{StaticResource GlInnerMargin}" />
+                    <ColumnDefinition Width="{StaticResource GridInnerMargin}" />
                     <ColumnDefinition Width="{StaticResource StandardWidth}" />
-                    <ColumnDefinition Width="{StaticResource GlInnerMargin}" />
+                    <ColumnDefinition Width="{StaticResource GridInnerMargin}" />
                     <ColumnDefinition Width="{StaticResource StandardWidth}" />
-                    <ColumnDefinition Width="{StaticResource GlInnerMargin}" />
+                    <ColumnDefinition Width="{StaticResource GridInnerMargin}" />
                     <ColumnDefinition Width="{StaticResource StandardWidth}" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="{StaticResource StandardHeight}" />
-                    <RowDefinition Height="{StaticResource GlInnerMargin}" />
+                    <RowDefinition Height="{StaticResource GridInnerMargin}" />
                     <RowDefinition Height="{StaticResource StandardHeight}" />
-                    <RowDefinition Height="{StaticResource GlInnerMargin}" />
+                    <RowDefinition Height="{StaticResource GridInnerMargin}" />
                     <RowDefinition Height="{StaticResource StandardHeight}" />
-                    <RowDefinition Height="{StaticResource GlInnerMargin}" />
+                    <RowDefinition Height="{StaticResource GridInnerMargin}" />
                     <RowDefinition Height="{StaticResource StandardHeight}" />
-                    <RowDefinition Height="{StaticResource GlInnerMargin}" />
+                    <RowDefinition Height="{StaticResource GridInnerMargin}" />
                     <RowDefinition Height="{StaticResource StandardHeight}" />
                 </Grid.RowDefinitions>
 
@@ -86,8 +91,8 @@
                           Grid.Row="2" 
                           Grid.Column="4" 
                           VerticalContentAlignment="Center" 
-                          ItemsSource="{StaticResource Multipliers}"
-                          SelectedIndex="0" />
+                          ItemsSource="{Binding Multipliers}"
+                          SelectedItem="{Binding Multiplier1}" />
                 <Button Name="BtnDropTable1"
                         Grid.Row="2"
                         Grid.Column="6"
@@ -117,8 +122,8 @@
                           Grid.Row="4" 
                           Grid.Column="4" 
                           VerticalContentAlignment="Center" 
-                          ItemsSource="{StaticResource Multipliers}"
-                          SelectedIndex="0" />
+                          ItemsSource="{Binding Multipliers}"
+                          SelectedItem="{Binding Multiplier2}"/>
                 <Button Name="BtnDropTable2"
                         Grid.Row="4"
                         Grid.Column="6"
@@ -148,8 +153,8 @@
                           Grid.Row="6" 
                           Grid.Column="4" 
                           VerticalContentAlignment="Center" 
-                          ItemsSource="{StaticResource Multipliers}"
-                          SelectedIndex="0" />
+                          ItemsSource="{Binding Multipliers}"
+                          SelectedItem="{Binding Multiplier3}" />
                 <Button Name="BtnDropTable3"
                         Grid.Row="6"
                         Grid.Column="6"
@@ -187,7 +192,7 @@
                      IsReadOnly="True" 
                      VerticalAlignment="Stretch" 
                      VerticalScrollBarVisibility="Auto" 
-                     Text="{Binding Path=Log, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                     Text="{Binding Path=Log, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/><!-- TODO Remove updateSourceTrigger -->
         </GroupBox>
     </DockPanel>
 </Window>
