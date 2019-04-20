@@ -21,7 +21,7 @@ namespace WisconsinSetup
 
             // Relation.ShowRecords(64);
 
-            new Relation("TestTable32", 32).WriteCsv();
+            new Relation("TestTable32", 32).WriteCsv("32.csv");
 
             Console.ReadLine();
         }

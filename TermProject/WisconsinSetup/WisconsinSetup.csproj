@@ -61,7 +61,7 @@
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="Record.cs" />
     <Compile Include="Relation.cs" />
-    <Compile Include="TableManager.cs" />
+    <Compile Include="QueryManager.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

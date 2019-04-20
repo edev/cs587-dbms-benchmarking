@@ -15,7 +15,7 @@ namespace WisconsinSetup
     /// <summary>
     ///     The View Model for the WisconsinSetup.MainWindow view. This class acts as the binding source
     ///     for most properties of said view and provides the interface for communicating with underlying models
-    ///     like WisconsinSetup.TableManager.
+    ///     like WisconsinSetup.QueryManager.
     /// </summary>
     class MainWindowViewModel : INotifyPropertyChanged
     {
@@ -23,9 +23,6 @@ namespace WisconsinSetup
         ///     The database connection.
         /// </summary>
         public readonly SQC.SqlConnection Connection = new SQC.SqlConnection();
-
-        // The TableManager instance used for SQL operations.
-        private TableManager _tableManager = null;
 
         /// <summary>
         ///     Creates a new MainWindowViewModel using default options.
@@ -141,7 +138,6 @@ namespace WisconsinSetup
                 // For safety and DRY-ness, we'll close and clear any previous resources.
                 // If we our connection attempt is successful, we'll open up again.
                 ConnectionState = ConnectionState.Closed;
-                _tableManager = null;
                 if (Connection.State == ConnectionState.Open)
                 {
                     LogEntry("Closing connection.");
@@ -152,7 +148,6 @@ namespace WisconsinSetup
 
                 // If we reach this point without raising an error, we have an open connection, and all is well.
                 // Time to open up shop!
-                _tableManager = new TableManager(Connection);
                 ConnectionState = Connection.State;
                 LogEntry("Connection open.");
                 LogEntry(""); // A blank line will help make the log easier to parse.
@@ -177,7 +172,6 @@ namespace WisconsinSetup
 
             Connection.Close();
             ConnectionState = Connection.State;
-            _tableManager = null;
         }
 
         // ========
@@ -258,18 +252,13 @@ namespace WisconsinSetup
         // ========
 
         /// <summary>
-        ///     Asks the TableManager to drop the given table, if it exists.
+        ///     Asks the QueryManager to drop the given table, if it exists.
         /// </summary>
         /// <param name="tableName"></param>
         public void DropTable(string tableName)
         {
-            if (_tableManager == null)
-            {
-                LogEntry("Table manager is not ready.");
-                return;
-            }
             LogEntry($"Drop table: {tableName}");
-            LogEntry(_tableManager.DropTableIfExists(tableName), 1); // TODO Clean up the indentation mess elsewhere!
+            LogEntry(QueryManager.DropTableIfExists(Connection, tableName), 1); // TODO Clean up the indentation mess elsewhere!
             LogEntry(""); // A blank line will help make the log easier to parse.
         }
 
@@ -290,20 +279,14 @@ namespace WisconsinSetup
         {
             lock (makeTableLock)
             {
-                if (_tableManager == null)
-                {
-                    LogEntry("Table manager is not ready.");
-                    return;
-                }
-
                 // We'll time the whole operation so we can report elapsed time at the end.
                 var watch = new Stopwatch();
                 watch.Start();
 
                 // First, we'll drop and re-create the table.
                 LogEntry($"Make table: {tableName}");
-                LogEntry(_tableManager.DropTableIfExists(tableName), 1);
-                LogEntry(_tableManager.CreateTable(tableName), 1);
+                LogEntry(QueryManager.DropTableIfExists(Connection, tableName), 1);
+                LogEntry(QueryManager.CreateTable(Connection, tableName), 1);
 
                 // Next, we'll see if we can reuse an existing CSV file or if we need to generate a new one.
                 string csvFilename = $"{tableSize}.csv";
@@ -331,7 +314,7 @@ namespace WisconsinSetup
 
                 // Finally, we'll issue a bulk load command to our DBMS.
                 LogEntry($"Bulk inserting data");
-                LogEntry(_tableManager.BulkInsert(tableName, csvFilename), 1);
+                LogEntry(QueryManager.BulkInsert(Connection, tableName, csvFilename), 1);
 
                 // Done!
                 LogEntry("Done.");
