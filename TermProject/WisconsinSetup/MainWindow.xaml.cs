@@ -80,7 +80,7 @@ namespace WisconsinSetup
             }
         }
 
-        private void tryMakeTable(string tableName, string numRowsString, long multiplier)
+        private void TryMakeTable(string tableName, string numRowsString, long multiplier)
         {
             long? numRows = _tryConvertToLong(numRowsString);
             if (!numRows.HasValue)
@@ -96,24 +96,24 @@ namespace WisconsinSetup
         private void BtnCreateTable1_OnClick(object sender, RoutedEventArgs e)
         {
 
-            tryMakeTable(TbTableName1.Text, TbRows1.Text, _viewModel.Multiplier1.ToInt64());
+            TryMakeTable(TbTableName1.Text, TbRows1.Text, _viewModel.Multiplier1.ToInt64());
         }
 
         private void BtnCreateTable2_OnClick(object sender, RoutedEventArgs e)
         {
-            tryMakeTable(TbTableName2.Text, TbRows2.Text, _viewModel.Multiplier2.ToInt64());
+            TryMakeTable(TbTableName2.Text, TbRows2.Text, _viewModel.Multiplier2.ToInt64());
         }
 
         private void BtnCreateTable3_OnClick(object sender, RoutedEventArgs e)
         {
-            tryMakeTable(TbTableName3.Text, TbRows3.Text, _viewModel.Multiplier3.ToInt64());
+            TryMakeTable(TbTableName3.Text, TbRows3.Text, _viewModel.Multiplier3.ToInt64());
         }
 
         private void BtnCreateAll_OnClick(object sender, RoutedEventArgs e)
         {
-            tryMakeTable(TbTableName1.Text, TbRows1.Text, _viewModel.Multiplier1.ToInt64());
-            tryMakeTable(TbTableName2.Text, TbRows2.Text, _viewModel.Multiplier2.ToInt64());
-            tryMakeTable(TbTableName3.Text, TbRows3.Text, _viewModel.Multiplier3.ToInt64());
+            TryMakeTable(TbTableName1.Text, TbRows1.Text, _viewModel.Multiplier1.ToInt64());
+            TryMakeTable(TbTableName2.Text, TbRows2.Text, _viewModel.Multiplier2.ToInt64());
+            TryMakeTable(TbTableName3.Text, TbRows3.Text, _viewModel.Multiplier3.ToInt64());
         }
          
         // ========
@@ -147,6 +147,10 @@ namespace WisconsinSetup
             string tableName3 = TbTableName3.Text;
             _viewModel.DropTable(tableName3);
         }
+
+        // ========
+        // SECTION: Delete all CSVs
+        // ========
 
         private void BtnDeleteCsvs_OnClick(object sender, RoutedEventArgs e)
         {

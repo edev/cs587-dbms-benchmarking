@@ -12,19 +12,31 @@ using System.Diagnostics;
 
 namespace WisconsinSetup
 {
+    /// <summary>
+    ///     The View Model for the WisconsinSetup.MainWindow view. This class acts as the binding source
+    ///     for most properties of said view and provides the interface for communicating with underlying models
+    ///     like WisconsinSetup.TableManager.
+    /// </summary>
     class MainWindowViewModel : INotifyPropertyChanged
     {
+        /// <summary>
+        ///     The database connection.
+        /// </summary>
         public readonly SQC.SqlConnection Connection = new SQC.SqlConnection();
 
+        // The TableManager instance used for SQL operations.
         private TableManager _tableManager = null;
 
+        /// <summary>
+        ///     Creates a new MainWindowViewModel using default options.
+        /// </summary>
         public MainWindowViewModel()
         {
-            // Set the initially selected multipliers to the first one in the list.
+            // Set the initially selected multipliers as sensible defaults.
             // We can't do this using initialization syntax, which is not shocking.
-            Multiplier1 = Multipliers[0];
-            Multiplier2 = Multipliers[0];
-            Multiplier3 = Multipliers[0];
+            Multiplier1 = Multipliers[1];
+            Multiplier2 = Multipliers[2];
+            Multiplier3 = Multipliers[2];
             ConnectionString = "Data Source=DYLAN-6CORE;Initial Catalog=wiscbench;Integrated Security=true;";
         }
 
@@ -34,10 +46,10 @@ namespace WisconsinSetup
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        /* When a property changes, we'll call NotifyPropertyChanged, which will infer
-         * the name of the property that changed and fire an appropriate event.
-         * We'll invoke this function any time we change a value, e.g. through
-         * a property's setter. */
+        // When a property changes, we'll call NotifyPropertyChanged, which will infer the name of the property
+        // that changed and fire an appropriate event. We'll invoke this function any time we change a value,
+        // e.g. through a property's setter. (In rare cases when we need to notify for a different property,
+        // we can do that by overriding propertyName.)
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             if (propertyName != null)
@@ -50,19 +62,37 @@ namespace WisconsinSetup
         // SECTION: Logging
         // ========
 
+        // The backing datatype that stores a mutable copy of the log.
         private readonly StringBuilder _log = new StringBuilder();
 
-        public string Log => _log.ToString();
+        /// <summary>
+        ///     Read-only property that represents the current contents of the log. Any UI elements that need
+        ///     to show the log should bind to this property.
+        /// </summary>
+        public string Log
+        {
+            get
+            {
+                lock (_log)
+                {
+                    return _log.ToString();
+                }
+            }
+        }                                                                                                              
 
         public string LogIndent { get; set; } = "    ";
 
-        /* Add a new entry (line) to the log.
-         * entry - the contents of the line (not including the newline)
-         * nestingLevel - a numeric representation of the indentation level,
-         *      expressed as the number of indents desired. This is NOT the
-         *      number of spaces to indent! nestingLevel will be multiplied
-         *      by LogIndent to obtain the final indentation text.
-         */
+        /// <summary>
+        ///     Add a new entry (line) to the log.
+        /// </summary>
+        /// <param name="entry">
+        ///     The contents of the line (not including the newline)
+        /// </param>
+        /// <param name="nestingLevel">
+        ///     A numeric representation of the indentation level, expressed as the number of indents desired. 
+        ///     This is NOT the number of spaces to indent! nestingLevel will be multiplied by LogIndent to obtain 
+        ///     the final indentation text.
+        /// </param>
         public void LogEntry(string entry, int nestingLevel = 0)
         {
             lock (_log)
@@ -100,8 +130,10 @@ namespace WisconsinSetup
             }
         }
 
-        // Attempt to connect to the database using the connection string that the user
-        // specified in the UI (which was hopefully bound via ConnectionString).
+        /// <summary>
+        ///     Attempt to connect to the database using the connection string that the user specified in the UI
+        ///     (which was hopefully bound via ConnectionString).
+        /// </summary>
         public void Connect()
         {
             try
@@ -118,20 +150,22 @@ namespace WisconsinSetup
 
                 Connection.Open();
 
-                // If we reach this point without raising an error, we have an open connection,
-                // and all is well. Time to open up shop!
+                // If we reach this point without raising an error, we have an open connection, and all is well.
+                // Time to open up shop!
                 _tableManager = new TableManager(Connection);
                 ConnectionState = Connection.State;
                 LogEntry("Connection open.");
             }
             catch (Exception exc)
             {
-                // Connection.Open() threw an error, most likely.
-                // Log it and move on.
+                // Connection.Open() threw an error, most likely. Log it and move on.
                 LogEntry(exc.Message);
             }
         }
 
+        /// <summary>
+        ///     Close the connection to the database.
+        /// </summary>
         public void Disconnect()
         {
             if (Connection.State == ConnectionState.Open)
@@ -149,14 +183,17 @@ namespace WisconsinSetup
         // ========
 
         // TODO See whether to use a converter and validation rule here. Seems like a lot of work and isn't very well explained on docs.microsoft.com.
-        // For now, we do NOT bind these, because it saves quite a bit of work to simply attempt to convert them on-demand in the MainWindow code-behind.
-        // It's not ideal, but it's a lot less work, and it's plenty good for this project.
+        // For now, we do NOT bind these, because it saves quite a bit of work to simply attempt to convert them
+        // on-demand in the MainWindow code-behind. It's not ideal, but it's a lot less work,
+        // and it's plenty good for this project.
 
         // ========
         // SECTION: Table Size Multipliers
         // ========
 
-        // Our collection of multipliers, which populates the selectable list in the UI.
+        /// <summary>
+        ///     Our collection of multipliers, which populates the selectable list in the UI.
+        /// </summary>
         public ObservableCollection<Multiplier> Multipliers { get; } = new ObservableCollection<Multiplier>
         {
             new Multiplier("1x", 1),
@@ -168,6 +205,10 @@ namespace WisconsinSetup
 
         // The currently selected multiplier for table 1.
         private Multiplier _multiplier1;
+
+        /// <summary>
+        ///     Returns the currently-selected multiplier for the first table.
+        /// </summary>
         public Multiplier Multiplier1
         {
             get => _multiplier1;
@@ -180,6 +221,10 @@ namespace WisconsinSetup
 
         // The currently selected multiplier for table 2.
         private Multiplier _multiplier2;
+
+        /// <summary>
+        ///     Returns the currently-selected multiplier for the second table.
+        /// </summary>
         public Multiplier Multiplier2
         {
             get => _multiplier2;
@@ -192,6 +237,10 @@ namespace WisconsinSetup
 
         // The currently selected multiplier for table 3.
         private Multiplier _multiplier3;
+
+        /// <summary>
+        ///     Returns the currently-selected multiplier for the third table.
+        /// </summary>
         public Multiplier Multiplier3
         {
             get => _multiplier3;
@@ -206,6 +255,10 @@ namespace WisconsinSetup
         // SECTION: Drop Table
         // ========
 
+        /// <summary>
+        ///     Asks the TableManager to drop the given table, if it exists.
+        /// </summary>
+        /// <param name="tableName"></param>
         public void DropTable(string tableName)
         {
             if (_tableManager == null)
@@ -224,10 +277,12 @@ namespace WisconsinSetup
         // All MakeTable instances will lock around this object in order to serialize their access.
         private object makeTableLock = new object();
 
-        /* This function contains the exact instructions for making a given table,
-         * expressed in terms of TableManager methods.
-         TODO Make this async, or run in a background task, or whatever. Don't lock up the UI thread or we'll crash/pause to debug!
-         */
+        /// <summary>
+        ///     This method drops the named table if it exists, creates a new table, and populates it with
+        ///     the specified number of entries.
+        /// </summary>
+        /// <param name="tableName">The SQL name of the table to (re)create.</param>
+        /// <param name="tableSize">The number of records to generate and load into the new table.</param>
         public void MakeTable(string tableName, long tableSize)
         {
             lock (makeTableLock)
@@ -280,6 +335,9 @@ namespace WisconsinSetup
         // SECTION: Delete all CSVs
         // ========
 
+        /// <summary>
+        ///     Deletes all .csv files in the current directory.
+        /// </summary>
         public void DeleteAllCsvs()
         {
             // Adapted from solution 1 of:

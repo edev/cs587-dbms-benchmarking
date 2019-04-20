@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace WisconsinSetup
 {
+    /// <summary>
+    ///     This class provides a mapping between a human-readable label and a machine-readable number, like
+    ///     "Million" and 1000000. It provides conversions between string and long. 
+    /// </summary>
     class Multiplier : IConvertible
     {
         private readonly string _label;
@@ -26,14 +30,11 @@ namespace WisconsinSetup
 
         public long ToInt64(IFormatProvider provider = null) => _value;
 
+        public TypeCode GetTypeCode() => TypeCode.Object;
+
         // ========
         // SECTION: Invalid casts
         // ========
-
-        public TypeCode GetTypeCode()
-        {
-            return TypeCode.Object;
-        }
 
         public bool ToBoolean(IFormatProvider provider)
         {

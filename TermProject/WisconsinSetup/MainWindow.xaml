@@ -15,6 +15,9 @@
         <Thickness x:Key="TInnerMargin">0,0,4,0</Thickness>
     </Window.Resources>
     <DockPanel VerticalAlignment="Stretch">
+
+
+
         <GroupBox Header="Connection" 
                   DockPanel.Dock="Top"
                   VerticalAlignment="Top" 
@@ -48,6 +51,8 @@
             </Grid>
         </GroupBox>
 
+
+
         <GroupBox Header="Table Setup" 
                   DockPanel.Dock="Top" 
                   VerticalAlignment="Top" 
@@ -76,21 +81,28 @@
                     <RowDefinition Height="{StaticResource StandardHeight}" />
                 </Grid.RowDefinitions>
 
+                <!-- Elements are organized first by row, then by column,
+                     with vertical whitespace between rows. -->
+
+                <!-- Row 0 -->
                 <Label Grid.Row="0" Grid.Column="0">Table name:</Label>
                 <Label Grid.Row="0" Grid.Column="2"># Rows:</Label>
                 <Label Grid.Row="0" Grid.Column="4">Multiplier:</Label>
 
+
+
+                <!-- Row 2 -->
                 <TextBox Name="TbTableName1" 
                          Grid.Row="2" 
                          Grid.Column="0" 
                          VerticalContentAlignment="Center">
-                    TENKTUP
+                    HUNDREDKTUP
                 </TextBox>
                 <TextBox Name="TbRows1" 
                          Grid.Row="2" 
                          Grid.Column="2" 
                          VerticalContentAlignment="Center">
-                    1
+                    100
                 </TextBox>
                 <ComboBox Name="CbMultiplier1" 
                           Grid.Row="2" 
@@ -111,6 +123,9 @@
                     Make table
                 </Button>
 
+
+
+                <!-- Row 4 -->
                 <TextBox Name="TbTableName2" 
                          Grid.Row="4" 
                          Grid.Column="0" 
@@ -142,6 +157,9 @@
                     Make table
                 </Button>
 
+
+
+                <!-- Row 6 -->
                 <TextBox Name="TbTableName3" 
                          Grid.Row="6" 
                          Grid.Column="0" 
@@ -173,6 +191,9 @@
                     Make table
                 </Button>
 
+
+
+                <!-- Row 8 -->
                 <Button Name="BtnDropAll"
                         Grid.Row="8"
                         Grid.Column="6"
@@ -194,8 +215,11 @@
                         Click="BtnDeleteCsvs_OnClick">
                     Delete CSVs
                 </Button>
+
             </Grid>
         </GroupBox>
+
+
 
         <GroupBox Header="Log" 
                   DockPanel.Dock="Top" 
