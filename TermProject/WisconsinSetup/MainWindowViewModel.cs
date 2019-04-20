@@ -155,6 +155,7 @@ namespace WisconsinSetup
                 _tableManager = new TableManager(Connection);
                 ConnectionState = Connection.State;
                 LogEntry("Connection open.");
+                LogEntry(""); // A blank line will help make the log easier to parse.
             }
             catch (Exception exc)
             {
@@ -171,6 +172,7 @@ namespace WisconsinSetup
             if (Connection.State == ConnectionState.Open)
             {
                 LogEntry("Closing connection.");
+                LogEntry(""); // A blank line will help make the log easier to parse.
             }
 
             Connection.Close();
@@ -268,6 +270,7 @@ namespace WisconsinSetup
             }
             LogEntry($"Drop table: {tableName}");
             LogEntry(_tableManager.DropTableIfExists(tableName), 1); // TODO Clean up the indentation mess elsewhere!
+            LogEntry(""); // A blank line will help make the log easier to parse.
         }
 
         // ========
@@ -302,20 +305,33 @@ namespace WisconsinSetup
                 LogEntry(_tableManager.DropTableIfExists(tableName), 1);
                 LogEntry(_tableManager.CreateTable(tableName), 1);
 
-                // Next, we'll generate our rows and write our CSV file.
-                var relation = new Relation(tableName, tableSize);
-                LogEntry($"Write CSV"); // TODO Save some time by incorporating a row count into CSV filename and reusing it if it exists!
-                try
+                // Next, we'll see if we can reuse an existing CSV file or if we need to generate a new one.
+                string csvFilename = $"{tableSize}.csv";
+                if (System.IO.File.Exists(csvFilename))
                 {
-                    relation.WriteCsv();
+                    LogEntry($"Reusing csv: {csvFilename}");
                 }
-                catch (Exception exc)
+                else
                 {
-                    LogEntry(exc.Message);
+                    // No dice. We'll create a new Relation and use it to generate our values.
+                    var relation = new Relation(tableName, tableSize);
+                    LogEntry($"Write CSV: {csvFilename}"); // TODO Save some time by incorporating a row count into CSV filename and reusing it if it exists!
+                    try
+                    {
+                        relation.WriteCsv(csvFilename);
+                    }
+                    catch (Exception exc)
+                    {
+                        // We couldn't write the CSV, so we can't go any further.
+                        LogEntry(exc.Message);
+                        LogEntry("Aborting.");
+                        return;
+                    }
                 }
 
                 // Finally, we'll issue a bulk load command to our DBMS.
-                LogEntry(_tableManager.BulkInsert(tableName, relation.CsvFilename));
+                LogEntry($"Bulk inserting data");
+                LogEntry(_tableManager.BulkInsert(tableName, csvFilename), 1);
 
                 // Done!
                 LogEntry("Done.");
@@ -328,6 +344,7 @@ namespace WisconsinSetup
                     ts.Hours, ts.Minutes, ts.Seconds,
                     ts.Milliseconds / 10);
                 LogEntry($"Elapsed time: {elapsedTime}");
+                LogEntry(""); // A blank line will help make the log easier to parse.
             }
         }
 
@@ -347,6 +364,7 @@ namespace WisconsinSetup
                 LogEntry($"Deleting {filename}");
                 System.IO.File.Delete(filename);
             }
+            LogEntry(""); // A blank line will help make the log easier to parse.
         }
     }
 }
