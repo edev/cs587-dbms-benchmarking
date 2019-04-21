@@ -19,7 +19,7 @@ The WisconsinSetup application automates as much as possible of the process of s
 
 WisconsinSetup is a C# GUI application written using Windows Presentation Foundation (WPF) under a Model-View-ViewModel (MVVM) pattern, making extensive use of data binding to simplify communication between the GUI front-end and the underlying data. Although the project does not call for any of the above, I took the project as a learning opportunity. I began the term with basic knowledge of WPF, and I have now expanded my depth of knowledge and experience considerably.
 
-### Where to find critical code
+### Code for Generating Tables and Data
 
 The reference paper provides three main segments of code for part 1. You can find them as follows:
 
@@ -35,7 +35,7 @@ I chose to benchmark SQL Server 2017 using a Developer Edition license. Though t
 
 ## Evidence of successful data loading
 
-As evidence that I have successfully loaded well-formatted data into SQL Server 2017, I offer a screenshot of WisconsinSetup with a successful load log (on large tables) and a screenshot of a table query showing loaded data:
+As evidence that I have successfully loaded well-formatted data into SQL Server 2017, I offer screenshots (below) of WisconsinSetup with a successful load log (on large tables) and a screenshot of a table query showing loaded data. The file [SampleData.csv]() is a sample data file with 50 rows, per project specifications. Note that the paper's random number generator is entirely deterministic and will always generate the same sequence of numbers for any given tuple size (and similar sequences for similar tuple sizes). Since I follow this algorithm, there's no point in uploading three sample files of the same size, as they would be identical.
 
 ![Screenshot of WisconsinSetup application with a log showing 100 thousand, 1 million, and 1 million rows created for the three tables respectively](Part1-WisconsinSetupWithLog.png)
 
