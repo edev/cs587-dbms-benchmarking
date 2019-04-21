@@ -23,9 +23,9 @@ WisconsinSetup is a C# GUI application written using Windows Presentation Founda
 
 The reference paper provides three main segments of code for part 1. You can find them as follows:
 
-* The SQL for creating the required tables lives in [TermProject/WisconsinBenchmark/QueryManager.cs](TermProject/WisconsinBenchmark/QueryManager.cs).
-* The code for generating random `unique1` values lives in [TermProject/WisconsinBenchmark/Relation.cs](TermProject/WisconsinBenchmark/Relation.cs). (See below for details.)
-* The code for generating records from `unique1` and `unique2` values (including generating 52-character strings) lives in [TermProject/WisconsinBenchmark/Record.cs](TermProject/WisconsinBenchmark/Record.cs).
+* The SQL for creating the required tables lives in [TermProject/WisconsinSetup/QueryManager.cs](TermProject/WisconsinSetup/QueryManager.cs).
+* The code for generating random `unique1` values lives in [TermProject/WisconsinSetup/Relation.cs](TermProject/WisconsinSetup/Relation.cs). (See below for details.)
+* The code for generating records from `unique1` and `unique2` values (including generating 52-character strings) lives in [TermProject/WisconsinSetup/Record.cs](TermProject/WisconsinSetup/Record.cs).
 
 **Generating random integers:** The code for generating random values is a bit buried, for good reason. The Relation class implements the IEnumerable interface, which means that we can write code like `foreach (Record r in new Relation(tableName, numberOfRecords)` to iterate over the records in the relation. I adapted the code for generating the relation into the methods of the IEnumerator interface on the private class RelationEnum. The effect of this decision is that the Relation class only generates rows as they are needed. (Note that it does _not_ cache records. Like the paper's record-generation algorithm, the Relation class is designed under the assumption that tables might not fit in main memory.) The primary use case is the `WriteCsv(string csvFilename)` function, which generates rows and immediately writes them to a CSV file. 
 
