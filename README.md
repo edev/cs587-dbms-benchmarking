@@ -3,6 +3,10 @@ Term project benchmarking Microsoft SQL Server under the Wisconsin Benchmark for
 
 The basis of the project is The Wisconsin Benchmark. Our reference material for this is: [The Wisconsin Benchmark: Past, Present, and Future](http://firebird.sourceforge.net/download/test/wisconsin_benchmark_chapter4.pdf).
 
+## Project Part 2
+
+See file [Part 2.docx](Part 2.docx)
+
 ## Project Part 1
 
 Part 1 consists of:
@@ -54,3 +58,4 @@ I encountered issues with WPF data binding and static resources. These mostly re
 I learned a bit about how different SQL Server 2017 is from Postgresql and, in turn, how different the Microsoft developer ecosystem is from the Linux developer ecosystem. In particular, I learned that Microsoft's ecosystem comprises a rich fabric of deeply interconnected systems that work best when taken as a whole. For example, after two days of research, I ultimately connected WisconsinSetup to SQL Server 2017 using a Windows account. This is theoretically more secure and easier than using an authentication system built into the DBMS (which SQL Server also supports), but the mere presence of Windows account support in SQL Server made simply connecting to the database a much more daunting task than connecting to Postgresql. 
 
 Additionally, after implementing the MVVM design pattern with data binding, I found that writing course-grained asynchronous code, which had been very painful in my first WPF application, was shockingly simple and easy! Using all of Microsoft's interconnected systems in combination made them all work smoothly and easily. I carry this forth as a valuable lesson learned.
+
