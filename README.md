@@ -5,7 +5,7 @@ The basis of the project is The Wisconsin Benchmark. Our reference material for 
 
 ## Project Part 2
 
-See file [Part 2.docx](Part 2.docx)
+See file [Part 2.docx](Part%202.docx)
 
 ## Project Part 1
 
